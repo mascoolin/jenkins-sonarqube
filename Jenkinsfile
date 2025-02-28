@@ -21,8 +21,8 @@ pipeline {
                         -Dsonar.projectKey=myapp \
                         -Dsonar.projectName=myapp \
                         -Dsonar.sources=. \
-                        -Dsonar.host.url=http://<SONARQUBE_SERVER_IP>:9000 \
-                        -Dsonar.login=<SONARQUBE_TOKEN>
+                        -Dsonar.host.url=192.168.1.15:9000 \
+                        -Dsonar.login=sqa_230e79717b9c28963da3d8d5d801e36aa3e3291e
                     """
                 }
             }
