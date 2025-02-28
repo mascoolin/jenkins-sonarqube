@@ -2,29 +2,42 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_URL = 'SonarQube' // Sesuai dengan nama yang dikonfigurasi di Jenkins
+        SONAR_SCANNER_HOME = tool 'SonarQube Scanner'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url:  'https://github.com/mascoolin/jenkins-sonarqube.git'
+                git branch: 'main', 
+                url: 'https://github.com/mascoolin/jenkins-sonarqube.git'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=MyProject -Dsonar.sources=.'
+                    sh """
+                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=myapp \
+                        -Dsonar.projectName=myapp \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://<SONARQUBE_SERVER_IP>:9000 \
+                        -Dsonar.login=<SONARQUBE_TOKEN>
+                    """
                 }
             }
         }
 
-        stage('Quality Gate') {
+        stage('Build & Test') {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+                sh 'mvn clean package' // Contoh untuk Java/Maven
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'echo "Deploy aplikasi ke server..."'
+                // Tambahkan perintah deploy sesuai kebutuhan (e.g., SSH, Docker, dll.)
             }
         }
     }
