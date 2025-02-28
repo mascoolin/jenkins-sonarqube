@@ -2,7 +2,12 @@ pipeline {
     agent any
 
     tools {
-        sonarQube 'SonarScanner'
+        sonarScanner 'SonarScanner'  // Sesuai dengan nama yang dikonfigurasi di Jenkins
+    }
+
+    environment {
+        SONAR_HOST_URL = 'http://localhost:9000'  // Sesuaikan dengan URL SonarQube
+        SONAR_TOKEN = credentials('sonarqube-token')  // Buat "sonarqube-token" di Jenkins
     }
 
     stages {
@@ -15,7 +20,13 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=MyProject -Dsonar.sources=.'
+                    sh '''
+                        sonar-scanner \
+                          -Dsonar.projectKey=jenkins-sonarqube \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=$SONAR_HOST_URL \
+                          -Dsonar.login=$SONAR_TOKEN
+                    '''
                 }
             }
         }
